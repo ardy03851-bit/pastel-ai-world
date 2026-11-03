@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings — Pastel World</title>
+  <meta name="description" content="Tune the baseplate, sky, agents, appearance and data of your pastel AI world." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=chillax@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Pastel World home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="7" fill="#a8e6cf"/><rect x="9" y="9" width="14" height="14" rx="4" fill="#ffd3b6"/></svg>
+      Pastel World
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      <a href="index.html"><i data-lucide="house"></i><span>Home</span></a>
+      <a href="world.html"><i data-lucide="boxes"></i><span>World</span></a>
+      <a href="models.html"><i data-lucide="cpu"></i><span>Models</span></a>
+      <a href="settings.html"><i data-lucide="settings-2"></i><span>Settings</span></a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="btn btn-primary btn-sm" href="world.html"><i data-lucide="boxes"></i>World</a>
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode"><i data-lucide="moon"></i></button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="page-head">
+      <h1>Settings</h1>
+      <p>Everything here applies instantly to the world and saves to your browser.</p>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <h2><i data-lucide="square"></i>Baseplate</h2>
+        <div class="field">
+          <label for="s-plate-size">Size: <output id="o-plate-size">34</output> units</label>
+          <input type="range" id="s-plate-size" min="14" max="60" step="2" />
+        </div>
+        <div class="field">
+          <label for="s-plate-color">Baseplate colour</label>
+          <input type="color" id="s-plate-color" />
+        </div>
+        <div class="field">
+          <label for="s-sky">Sky colour</label>
+          <input type="color" id="s-sky" />
+        </div>
+        <label class="check"><input type="checkbox" id="s-grid" /> Grid on baseplate</label>
+        <label class="check"><input type="checkbox" id="s-fog" /> Pastel fog</label>
+        <label class="check"><input type="checkbox" id="s-shadows" /> Soft shadows</label>
+        <label class="check"><input type="checkbox" id="s-particles" /> Floating pastel particles</label>
+        <label class="check"><input type="checkbox" id="s-autorotate" /> Slowly rotate camera</label>
+      </section>
+
+      <section class="card">
+        <h2><i data-lucide="bot"></i>AI cubes</h2>
+        <div class="field">
+          <label for="s-tick">Decision interval: <output id="o-tick">6</output> s</label>
+          <input type="range" id="s-tick" min="2" max="20" step="1" />
+          <span class="hint">How often each cube thinks and acts on its own.</span>
+        </div>
+        <div class="field">
+          <label for="s-speed">Movement speed: <output id="o-speed">3.2</output> u/s</label>
+          <input type="range" id="s-speed" min="1" max="10" step="0.2" />
+        </div>
+        <div class="field">
+          <label for="s-speech">Speech bubble time: <output id="o-speech">5</output> s</label>
+          <input type="range" id="s-speech" min="2" max="15" step="1" />
+        </div>
+        <div class="field">
+          <label for="s-history">Memory (messages kept): <output id="o-history">14</output></label>
+          <input type="range" id="s-history" min="4" max="40" step="2" />
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><i data-lucide="palette"></i>Appearance</h2>
+        <div class="field">
+          <label>Theme</label>
+          <div class="seg" id="seg-theme">
+            <button type="button" data-val="light" aria-pressed="true">Light</button>
+            <button type="button" data-val="dark" aria-pressed="false">Dark</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Accent</label>
+          <div class="seg" id="seg-accent">
+            <button type="button" data-val="mint" aria-pressed="true">Mint</button>
+            <button type="button" data-val="pink" aria-pressed="false">Pink</button>
+            <button type="button" data-val="lavender" aria-pressed="false">Lavender</button>
+            <button type="button" data-val="blue" aria-pressed="false">Blue</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><i data-lucide="database"></i>Data</h2>
+        <p class="card-sub">Your models, agents and world live only in this browser.</p>
+        <div class="form-actions">
+          <button class="btn btn-ghost" id="btn-export"><i data-lucide="download"></i>Export JSON</button>
+          <button class="btn btn-ghost" id="btn-import"><i data-lucide="upload"></i>Import JSON</button>
+          <button class="btn btn-danger" id="btn-reset"><i data-lucide="trash-2"></i>Reset everything</button>
+        </div>
+        <input type="file" id="import-file" accept="application/json" class="sr-only" />
+      </section>
+    </div>
+  </main>
+
+  <script src="js/core.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

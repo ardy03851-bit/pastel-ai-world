@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>World — Pastel World</title>
+  <meta name="description" content="A 3D pastel baseplate where AI cubes live, move and speak. Give them freedom or a prompt." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=chillax@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* World page layout */
+    .world-shell {
+      display: flex;
+      height: calc(100dvh - 61px);
+      overflow: hidden;
+    }
+    .toolbar {
+      width: 76px;
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-2);
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      overflow-y: auto;
+    }
+    .tool-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: 2px solid transparent;
+      color: var(--color-text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      transition:
+        background var(--transition-interactive),
+        border-color var(--transition-interactive),
+        color var(--transition-interactive),
+        transform var(--transition-bouncy);
+    }
+    .tool-btn:hover {
+      background: var(--color-surface-offset);
+      color: var(--color-text);
+    }
+    .tool-btn.active {
+      background: var(--accent-highlight);
+      border-color: var(--accent);
+      color: var(--color-text);
+    }
+    .tool-btn:active { transform: scale(0.92); }
+    .tool-btn .tool-emoji { font-size: 22px; line-height: 1; }
+    .tool-sep {
+      width: 40px;
+      height: 1px;
+      background: var(--color-divider);
+      margin: var(--space-1) 0;
+      flex: none;
+    }
+    .stage {
+      flex: 1;
+      position: relative;
+      min-width: 0;
+      background: #dfe9f7;
+      overflow: hidden;
+    }
+    .stage canvas { touch-action: none; }
+    .stage-hint {
+      position: absolute;
+      top: var(--space-4);
+      left: 50%;
+      transform: translateX(-50%);
+      background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: var(--space-2) var(--space-5);
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      box-shadow: var(--shadow-md);
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--transition-interactive);
+      text-align: center;
+      max-width: 90%;
+    }
+    .stage-hint.show { opacity: 1; }
+    .stage-legend {
+      position: absolute;
+      bottom: var(--space-3);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: var(--text-xs);
+      color: rgba(45, 42, 38, 0.55);
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius-full);
+      padding: 2px var(--space-4);
+      z-index: 5;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    [data-theme='dark'] .stage-legend { color: rgba(240, 238, 246, 0.6); background: rgba(30, 28, 40, 0.5); }
+    .stage-actions {
+      position: absolute;
+      top: var(--space-4);
+      right: var(--space-4);
+      display: flex;
+      gap: var(--space-2);
+      z-index: 10;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .world-log {
+      position: absolute;
+      left: var(--space-4);
+      bottom: var(--space-4);
+      width: min(340px, 60%);
+      max-height: 200px;
+      overflow-y: auto;
+      background: color-mix(in oklab, var(--color-surface) 85%, transparent);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-xs);
+      z-index: 10;
+      box-shadow: var(--shadow-sm);
+    }
+    .world-log h3 {
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .world-log h3 button { font-size: 10px; color: var(--color-text-faint); }
+    .log-line { padding: 3px 0; color: var(--color-text-muted); border-top: 1px solid var(--color-divider); overflow-wrap: anywhere; }
+    .log-line:first-of-type { border-top: none; }
+    .log-line b { color: var(--color-text); font-weight: 600; }
+    .log-line .err { color: var(--color-error); }
+
+    /* Inspector */
+    .inspector {
+      width: 320px;
+      flex: none;
+      background: var(--color-surface);
+      border-left: 1px solid var(--color-border);
+      overflow-y: auto;
+      padding: var(--space-5);
+    }
+    .inspector h2 {
+      font-size: var(--text-base);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .insp-empty { color: var(--color-text-muted); font-size: var(--text-sm); text-align: center; padding: var(--space-8) 0; }
+    .insp-empty .empty-art { font-size: 40px; margin-bottom: var(--space-3); }
+    .agent-head {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+    .agent-swatch {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      flex: none;
+      box-shadow: var(--shadow-sm), inset 0 -6px 10px rgba(0,0,0,0.06);
+    }
+    .agent-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-success);
+    }
+    .agent-status .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--color-success);
+      animation: pulse 1.6s ease infinite;
+    }
+    .agent-status.stopped { color: var(--color-text-faint); }
+    .agent-status.stopped .dot { background: var(--color-text-faint); animation: none; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .insp-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-3); }
+    .insp-actions .btn { flex: 1; min-width: 120px; }
+
+    .talk-box {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+    }
+    .talk-box input {
+      flex: 1;
+      min-width: 0;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+      font-size: var(--text-sm);
+    }
+    .talk-box input:focus { outline: none; border-color: var(--accent); }
+
+    .convo {
+      margin-top: var(--space-4);
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: var(--text-xs);
+    }
+    .convo-line { padding: var(--space-2) 0; border-top: 1px solid var(--color-divider); }
+    .convo-line .who { font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; }
+    .convo-line.thought .who { color: var(--color-lavender); }
+    .convo-line.err .who { color: var(--color-error); }
+
+    /* CSS2D labels */
+    .label-wrap { pointer-events: none; }
+    .cube-tag {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      color: #4a4740;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 2px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 1px 4px rgba(60, 55, 45, 0.18);
+    }
+    .cube-speech {
+      margin-top: 4px;
+      max-width: 220px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #3d3a33;
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 6px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(60, 55, 45, 0.08);
+      box-shadow: 0 4px 14px rgba(60, 55, 45, 0.16);
+      opacity: 0;
+      transform: translateY(6px) scale(0.95);
+      transition: opacity .3s, transform .3s;
+      text-align: center;
+    }
+    .cube-speech.show { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .world-shell { flex-direction: column; height: auto; }
+      .toolbar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        overflow-x: auto;
+      }
+      .tool-sep { width: 1px; height: 40px; margin: 0 var(--space-1); }
+      .stage { flex: none; height: 62dvh; }
+      .stage-hint { top: 104px; }
+      .stage-legend { display: none; }
+      .inspector { width: 100%; border-left: none; border-top: 1px solid var(--color-border); }
+      .world-log { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Pastel World home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="7" fill="#a8e6cf"/><rect x="9" y="9" width="14" height="14" rx="4" fill="#ffd3b6"/></svg>
+      Pastel World
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      <a href="index.html"><i data-lucide="house"></i><span>Home</span></a>
+      <a href="world.html"><i data-lucide="boxes"></i><span>World</span></a>
+      <a href="models.html"><i data-lucide="cpu"></i><span>Models</span></a>
+      <a href="settings.html"><i data-lucide="settings-2"></i><span>Settings</span></a>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" id="add-ai-btn"><i data-lucide="plus"></i>Add AI</button>
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode"><i data-lucide="moon"></i></button>
+    </div>
+  </header>
+
+  <div class="world-shell">
+    <aside class="toolbar" id="toolbar" aria-label="Add objects">
+      <button class="tool-btn" data-tool="ai" title="Add an AI cube — then click the baseplate"><span class="tool-emoji">🤖</span>AI</button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" data-tool="tree" title="Tree — click the baseplate to place"><span class="tool-emoji">🌳</span>Tree</button>
+      <button class="tool-btn" data-tool="rock" title="Rock"><span class="tool-emoji">🪨</span>Rock</button>
+      <button class="tool-btn" data-tool="ball" title="Ball"><span class="tool-emoji">⚽</span>Ball</button>
+      <button class="tool-btn" data-tool="lamp" title="Lamp"><span class="tool-emoji">💡</span>Lamp</button>
+      <button class="tool-btn" data-tool="pillar" title="Pillar"><span class="tool-emoji">🏛️</span>Pillar</button>
+      <button class="tool-btn" data-tool="ring" title="Ring"><span class="tool-emoji">⭕</span>Ring</button>
+      <button class="tool-btn" data-tool="flower" title="Flower"><span class="tool-emoji">🌸</span>Flower</button>
+      <button class="tool-btn" data-tool="star" title="Star"><span class="tool-emoji">⭐</span>Star</button>
+    </aside>
+
+    <section class="stage" id="stage" aria-label="3D world">
+      <div class="stage-hint" id="stage-hint"></div>
+      <div class="stage-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-cam-reset" title="Reset camera"><i data-lucide="video"></i>Reset view</button>
+        <button class="btn btn-ghost btn-sm" id="btn-pause" title="Pause or resume all AI"><i data-lucide="pause"></i><span id="pause-label">Pause all</span></button>
+      </div>
+      <div class="world-log" id="world-log">
+        <h3>World log <button id="clear-log">clear</button></h3>
+        <div id="log-lines"></div>
+      </div>
+      <div class="stage-legend">drag to orbit · scroll to zoom · drag objects to move · click an object to inspect</div>
+    </section>
+
+    <aside class="inspector" id="inspector" aria-label="Inspector">
+      <div class="insp-empty" id="insp-empty">
+        <div class="empty-art">🧊</div>
+        <h3>Nothing selected</h3>
+        <p>Click “Add AI” to drop a thinking cube on the baseplate, pick an object from the palette, or click any object to inspect it.</p>
+      </div>
+      <div id="insp-body" hidden></div>
+    </aside>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.183.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.183.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script src="js/core.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script type="module" src="js/world.js"></script>
+</body>
+</html>

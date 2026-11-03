@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Models — Pastel World</title>
+  <meta name="description" content="Add any AI model by URL, key and proxy — or use free keyless models from Pollinations, AI Horde and Puter." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=chillax@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Pastel World home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="7" fill="#a8e6cf"/><rect x="9" y="9" width="14" height="14" rx="4" fill="#ffd3b6"/></svg>
+      Pastel World
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      <a href="index.html"><i data-lucide="house"></i><span>Home</span></a>
+      <a href="world.html"><i data-lucide="boxes"></i><span>World</span></a>
+      <a href="models.html"><i data-lucide="cpu"></i><span>Models</span></a>
+      <a href="settings.html"><i data-lucide="settings-2"></i><span>Settings</span></a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="btn btn-primary btn-sm" href="world.html"><i data-lucide="boxes"></i>World</a>
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode"><i data-lucide="moon"></i></button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="page-head">
+      <h1>AI models</h1>
+      <p>Bring your own model from any website, or use free ones that need no key or account. Your keys stay in your browser only — never sent anywhere except the endpoint you choose.</p>
+    </section>
+
+    <!-- Free models -->
+    <section class="card" id="free-section">
+      <h2><i data-lucide="gift"></i>Free models — no key, no signup</h2>
+      <p class="card-sub">Fetched live from keyless providers. Click one to add it to your collection. Pollinations and AI Horde work instantly; Puter asks for a free account on first use.</p>
+      <div class="free-controls">
+        <button class="btn btn-soft" id="refresh-free"><i data-lucide="refresh-cw"></i>Fetch free models</button>
+        <span class="free-status" id="free-status" role="status"></span>
+      </div>
+      <div class="grid grid-3" id="free-grid"></div>
+    </section>
+
+    <!-- Custom model form -->
+    <section class="card">
+      <h2><i data-lucide="plug"></i>Add your own model</h2>
+      <p class="card-sub">Works with any OpenAI-compatible endpoint (Groq, Gemini, OpenRouter, Mistral, Cohere, DeepSeek, Hetzner…), native Gemini and Anthropic APIs, or any custom URL. The proxy URL is optional — use it when a provider blocks direct browser calls (CORS).</p>
+      <form id="model-form">
+        <input type="hidden" id="f-id" />
+        <div class="form-row">
+          <div class="field">
+            <label for="f-name">Display name</label>
+            <input type="text" id="f-name" placeholder="e.g. My Groq Llama" required />
+          </div>
+          <div class="field">
+            <label for="f-kind">API style</label>
+            <select id="f-kind">
+              <option value="openai">OpenAI-compatible (most providers)</option>
+              <option value="gemini">Google Gemini (native)</option>
+              <option value="anthropic">Anthropic Claude</option>
+              <option value="pollinations">Pollinations (free)</option>
+              <option value="puter">Puter.js (free)</option>
+              <option value="horde">AI Horde (free)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-modelid">Model ID</label>
+            <input type="text" id="f-modelid" placeholder="e.g. llama-3.3-70b-versatile" />
+            <span class="hint">The model name the API expects.</span>
+          </div>
+          <div class="field">
+            <label for="f-baseurl">API base URL</label>
+            <input type="url" id="f-baseurl" placeholder="https://api.groq.com/openai/v1" />
+            <span class="hint">e.g. https://api.groq.com/openai/v1 — chat/completions is added automatically.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-apikey">API key <span class="badge badge-key">stored in your browser only</span></label>
+            <input type="password" id="f-apikey" placeholder="gsk_… (optional for free providers)" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="f-proxy">Proxy URL <span class="badge badge-off">optional</span></label>
+            <input type="url" id="f-proxy" placeholder="https://your-proxy.example/?url={url}" />
+            <span class="hint">For CORS-blocked providers. Supports <code>{url}</code> placeholder, <code>?url=</code> style, or plain prefix.</span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="f-test"><i data-lucide="plug-zap"></i>Test connection</button>
+          <button type="submit" class="btn btn-primary" id="f-save"><i data-lucide="check"></i>Save model</button>
+        </div>
+        <div class="field" style="margin-top:var(--space-3)">
+          <span class="hint" id="f-result" role="status"></span>
+        </div>
+        <details class="presets">
+          <summary>Quick-fill presets (free tiers — bring your own key)</summary>
+          <div class="preset-chips" id="preset-chips"></div>
+        </details>
+      </form>
+    </section>
+
+    <!-- Saved models -->
+    <section class="card">
+      <h2><i data-lucide="layers"></i>Your models</h2>
+      <p class="card-sub">Models available in the world’s “Add AI” picker. Custom ones you added plus free ones you picked.</p>
+      <div id="saved-list"></div>
+    </section>
+
+    <!-- Provider directory -->
+    <section class="card">
+      <h2><i data-lucide="globe"></i>Free-tier provider directory</h2>
+      <p class="card-sub">Many providers offer free access. Keyless ones work instantly; others need a free account and key — add those above.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Provider</th><th>How it’s free</th><th>Key?</th></tr>
+          </thead>
+          <tbody id="dir-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/core.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="js/models.js"></script>
+</body>
+</html>

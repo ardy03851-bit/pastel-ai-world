@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pastel World — AI cubes in a 3D playground</title>
+  <meta name="description" content="Drop AI cubes into a pastel 3D world. Add any AI model by URL, key and proxy, or use free keyless models. Give them freedom or a prompt." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=chillax@500,600,700&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Pastel World home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="7" fill="#a8e6cf"/><rect x="9" y="9" width="14" height="14" rx="4" fill="#ffd3b6"/></svg>
+      Pastel World
+    </a>
+    <nav class="main-nav" aria-label="Main">
+      <a href="index.html"><i data-lucide="house"></i><span>Home</span></a>
+      <a href="world.html"><i data-lucide="boxes"></i><span>World</span></a>
+      <a href="models.html"><i data-lucide="cpu"></i><span>Models</span></a>
+      <a href="settings.html"><i data-lucide="settings-2"></i><span>Settings</span></a>
+    </nav>
+    <div class="topbar-actions">
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+        <i data-lucide="moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="page-head">
+      <h1>A tiny pastel world where AI cubes live</h1>
+      <p>Pastel World is a 3D playground. Add an AI model — your own from any website, or a free keyless one — drop it into the world as a rounded cube, then give it total freedom or a specific prompt. It moves, speaks, changes colour and explores on its own.</p>
+    </section>
+
+    <section class="grid grid-3" aria-label="Main areas">
+      <a class="card link-card" href="world.html" style="text-decoration:none;color:inherit">
+        <div class="link-art" aria-hidden="true">🧊</div>
+        <h2>World</h2>
+        <p>The 3D baseplate. Add AI cubes, trees, lamps and more. Watch them roam.</p>
+        <span class="btn btn-primary" style="margin-top:var(--space-4)">Open world</span>
+      </a>
+      <a class="card link-card" href="models.html" style="text-decoration:none;color:inherit">
+        <div class="link-art" aria-hidden="true">🔌</div>
+        <h2>Models</h2>
+        <p>Add any AI model with a URL, API key and proxy — or pick a free one, no key needed.</p>
+        <span class="btn btn-soft" style="margin-top:var(--space-4)">Manage models</span>
+      </a>
+      <a class="card link-card" href="settings.html" style="text-decoration:none;color:inherit">
+        <div class="link-art" aria-hidden="true">🎛️</div>
+        <h2>Settings</h2>
+        <p>Baseplate size and colour, sky, fog, movement speed, themes and saved data.</p>
+        <span class="btn btn-ghost" style="margin-top:var(--space-4)">Tune it</span>
+      </a>
+    </section>
+
+    <section class="card section-gap">
+      <h2><i data-lucide="sparkles"></i>How it works</h2>
+      <ol class="steps">
+        <li><strong>Get a brain.</strong> Open <a href="models.html">Models</a> and either add your own AI (name, API URL, key, optional proxy URL for CORS) or grab a free model — Pollinations and AI Horde need no key or account at all.</li>
+        <li><strong>Drop it in.</strong> In the <a href="world.html">World</a>, click “Add AI”, pick its model and a pastel colour, then click the baseplate to place your cube.</li>
+        <li><strong>Set it free.</strong> Choose <em>Freedom</em> and it decides what to do every few seconds — or choose <em>Prompt</em> and give it a mission. It returns actions as JSON and its cube moves, jumps, spins, speaks and recolours itself.</li>
+        <li><strong>Decorate.</strong> Add trees, rocks, lamps, pillars and more from the palette. Drag things around. Everything saves in your browser.</li>
+      </ol>
+    </section>
+
+    <section class="grid grid-3 section-gap" aria-label="Your world at a glance">
+      <div class="card stat-card">
+        <div class="stat-value" id="stat-agents">–</div>
+        <div class="stat-label">AI cubes in your world</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value" id="stat-models">–</div>
+        <div class="stat-label">custom models configured</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value" id="stat-objects">–</div>
+        <div class="stat-label">objects on the baseplate</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/core.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
+    document.getElementById('stat-agents').textContent = PW.data.agents.length;
+    document.getElementById('stat-models').textContent = PW.data.models.length;
+    document.getElementById('stat-objects').textContent = PW.data.world.objects.length;
+  </script>
+</body>
+</html>
