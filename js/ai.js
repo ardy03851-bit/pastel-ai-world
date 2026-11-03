@@ -19,6 +19,7 @@
 
   /* Presets for well-known providers (user supplies their own API key) */
   AI.PRESETS = [
+    { name: 'Start blank (any provider)', kind: 'openai', baseUrl: '', modelId: '' },
     { name: 'Groq (free tier)', kind: 'openai', baseUrl: 'https://api.groq.com/openai/v1', modelId: 'llama-3.3-70b-versatile' },
     { name: 'Google Gemini (free tier)', kind: 'openai', baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', modelId: 'gemini-2.0-flash' },
     { name: 'OpenRouter (free models)', kind: 'openai', baseUrl: 'https://openrouter.ai/api/v1', modelId: 'meta-llama/llama-3.3-70b-instruct:free' },
@@ -97,7 +98,12 @@
       max_tokens: opts.maxTokens ?? 500,
     };
     const { json } = await httpJson(url, { method: 'POST', headers, body: JSON.stringify(body) });
-    const msg = json?.choices?.[0]?.message?.content;
+    const message = json?.choices?.[0]?.message;
+    /* Reasoning models (gpt-oss, Qwen3, DeepSeek-R1…) can leave content empty
+       and put text in reasoning fields — fall back so the cube still gets a reply. */
+    const msg = message?.content
+      || (Array.isArray(message?.reasoning_content) ? message.reasoning_content.join('') : message?.reasoning_content)
+      || (Array.isArray(message?.reasoning) ? message.reasoning.join('') : message?.reasoning);
     if (!msg) throw new Error('Empty response from provider');
     return typeof msg === 'string' ? msg : JSON.stringify(msg);
   }

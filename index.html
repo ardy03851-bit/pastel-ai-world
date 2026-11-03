@@ -86,9 +86,19 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <script>
     lucide.createIcons();
-    document.getElementById('stat-agents').textContent = PW.data.agents.length;
-    document.getElementById('stat-models').textContent = PW.data.models.length;
-    document.getElementById('stat-objects').textContent = PW.data.world.objects.length;
+    function countUp(el, target) {
+      const t0 = performance.now();
+      const dur = 900;
+      const step = (t) => {
+        const k = Math.min(1, (t - t0) / dur);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+    countUp(document.getElementById('stat-agents'), PW.data.agents.length);
+    countUp(document.getElementById('stat-models'), PW.data.models.length);
+    countUp(document.getElementById('stat-objects'), PW.data.world.objects.length);
   </script>
 </body>
 </html>

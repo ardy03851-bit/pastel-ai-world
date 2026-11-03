@@ -202,6 +202,102 @@ const BUILDERS = {
     const g = new THREE.Group(); g.add(m);
     return shadowify(g);
   },
+  house(color) {
+    const g = new THREE.Group();
+    const walls = new THREE.Mesh(new RoundedBoxGeometry(1.5, 1.1, 1.3, 3, 0.06), std(color));
+    walls.userData.primary = true;
+    walls.position.y = 0.55;
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(1.25, 0.85, 4), std('#e8a3a0'));
+    roof.userData.primary = true;
+    roof.position.y = 1.52;
+    roof.rotation.y = Math.PI / 4;
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.55, 0.06), std('#b98a63'));
+    door.position.set(0, 0.28, 0.68);
+    const chimney = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.45, 0.22), std('#d9cfc4'));
+    chimney.position.set(0.45, 1.7, 0.35);
+    g.add(walls, roof, door, chimney);
+    return shadowify(g);
+  },
+  cloud(color) {
+    const g = new THREE.Group();
+    const mat = std(color, { roughness: 0.9, transparent: true, opacity: 0.92 });
+    const puffs = [
+      [0, 1.9, 0, 0.52],
+      [0.55, 1.78, 0.1, 0.38],
+      [-0.55, 1.8, -0.08, 0.36],
+      [0.18, 2.1, -0.15, 0.34],
+    ];
+    for (const [px, py, pz, r] of puffs) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), mat);
+      p.userData.primary = true;
+      p.position.set(px, py, pz);
+      g.add(p);
+    }
+    return shadowify(g);
+  },
+  crystal(color) {
+    const g = new THREE.Group();
+    const m = new THREE.Mesh(new THREE.OctahedronGeometry(0.55, 0), std(color, { roughness: 0.15, transparent: true, opacity: 0.85, emissive: color, emissiveIntensity: 0.25, flatShading: true }));
+    m.userData.primary = true;
+    m.position.y = 0.75;
+    m.scale.y = 1.6;
+    const shard = new THREE.Mesh(new THREE.OctahedronGeometry(0.26, 0), std(color, { roughness: 0.15, transparent: true, opacity: 0.8 }));
+    shard.userData.primary = true;
+    shard.position.set(0.42, 0.4, 0.18);
+    shard.scale.y = 1.3;
+    g.add(m, shard);
+    return shadowify(g);
+  },
+  pond(color) {
+    const g = new THREE.Group();
+    const water = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.15, 0.1, 28), std(color, { roughness: 0.08, transparent: true, opacity: 0.75 }));
+    water.userData.primary = true;
+    water.position.y = 0.06;
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(1.12, 0.09, 10, 28), std('#c9b8a4'));
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = 0.08;
+    g.add(water, rim);
+    return g;
+  },
+  bush(color) {
+    const g = new THREE.Group();
+    const mat = std(color, { roughness: 0.85 });
+    const b1 = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 11), mat);
+    b1.userData.primary = true;
+    b1.position.set(-0.22, 0.36, 0);
+    const b2 = new THREE.Mesh(new THREE.SphereGeometry(0.32, 14, 11), mat);
+    b2.userData.primary = true;
+    b2.position.set(0.24, 0.28, 0.12);
+    const b3 = new THREE.Mesh(new THREE.SphereGeometry(0.28, 14, 11), mat);
+    b3.userData.primary = true;
+    b3.position.set(0.05, 0.5, -0.18);
+    g.add(b1, b2, b3);
+    return shadowify(g);
+  },
+  bench(color) {
+    const g = new THREE.Group();
+    const wood = std('#c9a27c');
+    const seat = new THREE.Mesh(new RoundedBoxGeometry(1.3, 0.12, 0.5, 2, 0.05), std(color));
+    seat.userData.primary = true;
+    seat.position.y = 0.62;
+    const back = new THREE.Mesh(new RoundedBoxGeometry(1.3, 0.5, 0.12, 2, 0.05), std(color, { roughness: 0.7 }));
+    back.userData.primary = true;
+    back.position.set(0, 0.92, -0.24);
+    const l1 = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.62, 8), wood);
+    l1.position.set(-0.55, 0.31, 0);
+    const l2 = l1.clone();
+    l2.position.x = 0.55;
+    g.add(seat, back, l1, l2);
+    return shadowify(g);
+  },
+  arch(color) {
+    const g = new THREE.Group();
+    const m = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.14, 12, 32, Math.PI), std(color));
+    m.userData.primary = true;
+    m.position.y = 0.02;
+    g.add(m);
+    return shadowify(g);
+  },
 };
 
 /* Agent cube — rounded */
@@ -385,7 +481,7 @@ renderer.domElement.addEventListener('pointermove', (e) => {
     if (Math.abs(nx - ent.mesh.position.x) + Math.abs(nz - ent.mesh.position.z) > 0.05) dragging.moved = true;
     ent.mesh.position.x = nx;
     ent.mesh.position.z = nz;
-    if (ent.kind === 'agent') { ent.data.x = nx; ent.data.z = nz; ent.tx = nx; ent.tz = nz; }
+    if (ent.kind === 'agent') { ent.data.x = nx; ent.data.z = nz; ent.tx = nx; ent.tz = nz; ent.move = null; }
     else { ent.data.x = nx; ent.data.z = nz; }
   }
 });
@@ -446,7 +542,7 @@ function openAddAI() {
     <div class="field">
       <label for="ai-model">Brain (model)</label>
       <select id="ai-model">${modelOptions()}</select>
-      <span class="hint">Free models are marked with ✓. Manage models on the <a href="models.html">Models page</a>.</span>
+      <span class="hint">Free models are marked with ✓. Using your own provider? <a href="models.html">Add any model here</a> — paste its URL, no presets needed.</span>
     </div>
     <div class="field">
       <label>Behaviour</label>
@@ -616,6 +712,8 @@ function parseAgentJson(raw) {
 }
 
 const HEX_RE = /^#[0-9a-f]{6}$/i;
+const easeInOutCubic = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+
 async function executeActions(ent, parsed) {
   for (const a of parsed.actions) {
     if (!ent.data.running && !ent.manual) break;
@@ -624,16 +722,25 @@ async function executeActions(ent, parsed) {
         const dx = PW.clamp(Number(a.dx) || 0, -6, 6);
         const dz = PW.clamp(Number(a.dz) || 0, -6, 6);
         const b = plateBounds();
-        ent.tx = PW.clamp(ent.tx + dx, -b, b);
-        ent.tz = PW.clamp(ent.tz + dz, -b, b);
-        ent.data.x = ent.tx;
-        ent.data.z = ent.tz;
-        if (dx || dz) ent.mesh.rotation.y = Math.atan2(dx, dz);
+        const fx = PW.clamp(ent.tx + dx, -b, b);
+        const fz = PW.clamp(ent.tz + dz, -b, b);
+        ent.tx = fx;
+        ent.tz = fz;
+        ent.data.x = fx;
+        ent.data.z = fz;
+        const dist = Math.hypot(fx - ent.mesh.position.x, fz - ent.mesh.position.z);
+        if (dist > 0.05) {
+          // smooth glide: duration scales with distance, eased in and out
+          const dur = PW.clamp(dist / Math.max(0.8, S.moveSpeed), 0.35, 2.6);
+          ent.move = { sx: ent.mesh.position.x, sz: ent.mesh.position.z, fx, fz, t: 0, dur };
+          ent.targetYaw = Math.atan2(fx - ent.mesh.position.x, fz - ent.mesh.position.z);
+        }
         break;
       }
       case 'rotate': {
         const deg = PW.clamp(Number(a.degrees) || 0, -360, 360);
-        ent.mesh.rotation.y += THREE.MathUtils.degToRad(deg);
+        if (ent.targetYaw === undefined) ent.targetYaw = ent.mesh.rotation.y;
+        ent.targetYaw += THREE.MathUtils.degToRad(deg);
         break;
       }
       case 'jump': {
@@ -697,7 +804,7 @@ async function runTick(agent, { manual = false } = {}) {
   ];
   let raw;
   try {
-    raw = await PWAI.chat(model, messages, { temperature: 0.9, maxTokens: 450 });
+    raw = await PWAI.chat(model, messages, { temperature: 0.9, maxTokens: 900 });
     agent._backoff = false;
   } catch (err) {
     addLog(`<span class="err"><b>${PW.escapeHtml(agent.name)}</b>: ${PW.escapeHtml(err.message.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')).slice(0, 120)}</span>`);
@@ -899,10 +1006,16 @@ function renderConvo(ent) {
   }).join('') || '<div class="convo-line" style="color:var(--color-text-faint)">No conversation yet — start it and the cube will reply.</div>';
 }
 
+const OBJ_ICONS = {
+  tree: 'tree-pine', bush: 'sprout', flower: 'flower-2', rock: 'mountain', pond: 'droplets',
+  house: 'home', pillar: 'landmark', bench: 'armchair', arch: 'rainbow', lamp: 'lamp',
+  ball: 'circle', ring: 'circle-dashed', cloud: 'cloud', crystal: 'gem', star: 'star',
+};
+
 function renderObjectInspector(ent) {
   const o = ent.data;
   inspBody.innerHTML = `
-    <h2><i data-lucide="${o.type === 'tree' ? 'tree-pine' : 'shapes'}"></i>${o.type.charAt(0).toUpperCase() + o.type.slice(1)}</h2>
+    <h2><i data-lucide="${OBJ_ICONS[o.type] || 'shapes'}"></i>${o.type.charAt(0).toUpperCase() + o.type.slice(1)}</h2>
     <div class="field">
       <label for="io-color">Colour</label>
       <input type="color" id="io-color" value="${o.color}" />
@@ -972,29 +1085,64 @@ function animate() {
   for (const ent of entities.values()) {
     const m = ent.mesh;
     if (ent.kind === 'agent') {
-      // walk toward target
-      const speed = S.moveSpeed * delta;
-      const dx = ent.tx - m.position.x;
-      const dz = ent.tz - m.position.z;
-      const dist = Math.hypot(dx, dz);
-      if (dist > 0.02) {
-        const step = Math.min(dist, speed);
-        m.position.x += (dx / dist) * step;
-        m.position.z += (dz / dist) * step;
+      const body = m.children[0];
+      // smooth glide toward target (eased in and out)
+      if (ent.move) {
+        ent.move.t += delta / ent.move.dur;
+        const k = ent.move.t >= 1 ? 1 : easeInOutCubic(ent.move.t);
+        m.position.x = ent.move.sx + (ent.move.fx - ent.move.sx) * k;
+        m.position.z = ent.move.sz + (ent.move.fz - ent.move.sz) * k;
+        if (ent.move.t >= 1) { ent.move = null; PW.save(); }
+      } else {
+        // fallback: drift toward target (dragging, external changes)
+        const dx = ent.tx - m.position.x;
+        const dz = ent.tz - m.position.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist > 0.02) {
+          const step = Math.min(dist, S.moveSpeed * 2.5 * delta);
+          m.position.x += (dx / dist) * step;
+          m.position.z += (dz / dist) * step;
+        }
       }
-      // gentle bob
-      m.children[0].position.y = 0.62 + Math.sin(t * 2 + ent.bobPhase) * 0.045;
-      // jump
+      const moving = !!(ent.move && ent.move.t < 0.97);
+      // gentle idle bob + waddle while moving
+      body.position.y = 0.62 + Math.sin(t * 2 + ent.bobPhase) * 0.045;
+      if (moving) m.rotation.z = Math.sin(t * 11 + ent.bobPhase) * 0.06;
+      else m.rotation.z *= Math.max(0, 1 - delta * 7);
+      // smooth turn toward facing direction
+      if (ent.targetYaw !== undefined && !ent.spinLeft) {
+        let d = ((ent.targetYaw - m.rotation.y + Math.PI) % (Math.PI * 2)) - Math.PI;
+        if (Math.abs(d) < 0.015) m.rotation.y = ent.targetYaw;
+        else m.rotation.y += d * Math.min(1, delta * 9);
+      }
+      // jump with squash and stretch
       if (ent.jump) {
         ent.jump.t += delta * 2.2;
-        if (ent.jump.t >= 1) { ent.jump = null; m.children[0].position.y = 0.62; }
-        else m.children[0].position.y = 0.62 + Math.sin(ent.jump.t * Math.PI) * ent.jump.h * 0.5;
+        if (ent.jump.t >= 1) {
+          ent.jump = null;
+          body.position.y = 0.62;
+          ent.land = 0.16;
+        } else {
+          body.position.y = 0.62 + Math.sin(ent.jump.t * Math.PI) * ent.jump.h * 0.5;
+          const s = 1 + Math.sin(ent.jump.t * Math.PI) * 0.12;
+          body.scale.set(1 / Math.sqrt(s), s, 1 / Math.sqrt(s));
+        }
+      } else if (ent.land > 0) {
+        // landing squash, springs back
+        ent.land -= delta;
+        if (ent.land <= 0) body.scale.set(1, 1, 1);
+        else {
+          const k = ent.land / 0.16;
+          const s = 1 - Math.sin(k * Math.PI) * 0.14;
+          body.scale.set(1 / Math.sqrt(s), s, 1 / Math.sqrt(s));
+        }
       }
       // spin
       if (ent.spinLeft > 0.01) {
         const s = Math.min(ent.spinLeft, delta * 9);
         m.rotation.y += s;
         ent.spinLeft -= s;
+        if (ent.spinLeft <= 0.01 && ent.targetYaw !== undefined) ent.targetYaw = undefined;
       }
     } else if (ent.kind === 'object') {
       // idle animations handled below
@@ -1016,6 +1164,10 @@ function animate() {
       ent.mesh.children[0].rotation.y += delta * 0.7;
     } else if (o.type === 'flower') {
       ent.mesh.rotation.z = Math.sin(t * 1.4 + ent.bobPhase) * 0.05;
+    } else if (o.type === 'cloud') {
+      ent.mesh.position.y = Math.sin(t * 0.8 + ent.bobPhase) * 0.09;
+    } else if (o.type === 'crystal') {
+      ent.mesh.children[0].rotation.y += delta * 0.45;
     }
   }
 

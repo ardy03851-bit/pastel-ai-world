@@ -14,10 +14,10 @@
       document.getElementById('f-kind').value = p.kind;
       document.getElementById('f-baseurl').value = p.baseUrl;
       document.getElementById('f-modelid').value = p.modelId;
-      if (!document.getElementById('f-name').value) {
+      if (p.baseUrl && !document.getElementById('f-name').value) {
         document.getElementById('f-name').value = p.name.replace(/\s*\(.*\)$/, '');
       }
-      PW.toast('Preset filled in — add your API key');
+      PW.toast(p.baseUrl ? 'Preset filled in — add your API key' : 'Blank custom provider — paste any API URL and model ID');
     });
     chips.appendChild(b);
   });

@@ -48,7 +48,7 @@
     <!-- Custom model form -->
     <section class="card">
       <h2><i data-lucide="plug"></i>Add your own model</h2>
-      <p class="card-sub">Works with any OpenAI-compatible endpoint (Groq, Gemini, OpenRouter, Mistral, Cohere, DeepSeek, Hetzner…), native Gemini and Anthropic APIs, or any custom URL. The proxy URL is optional — use it when a provider blocks direct browser calls (CORS).</p>
+      <p class="card-sub">Use <strong>any provider you like</strong> — not just the presets. Paste its API base URL, model ID and key below: any OpenAI-compatible endpoint (Groq, OpenRouter, Mistral, Cohere, DeepSeek, Hetzner, your own server…), native Gemini and Anthropic APIs, or a fully custom URL. The proxy URL is optional — use it when a provider blocks direct browser calls (CORS).</p>
       <form id="model-form">
         <input type="hidden" id="f-id" />
         <div class="form-row">
@@ -59,13 +59,16 @@
           <div class="field">
             <label for="f-kind">API style</label>
             <select id="f-kind">
-              <option value="openai">OpenAI-compatible (most providers)</option>
+              <option value="openai">Custom / OpenAI-compatible — any provider</option>
               <option value="gemini">Google Gemini (native)</option>
               <option value="anthropic">Anthropic Claude</option>
               <option value="pollinations">Pollinations (free)</option>
               <option value="puter">Puter.js (free)</option>
               <option value="horde">AI Horde (free)</option>
+              <option value="ovh">OVHcloud AI (free)</option>
+              <option value="llm7">LLM7.io (free)</option>
             </select>
+            <span class="hint">Pick “Custom / OpenAI-compatible” for any provider on the internet — just paste its URL. Presets below only pre-fill this form.</span>
           </div>
         </div>
         <div class="form-row">
@@ -99,7 +102,7 @@
           <span class="hint" id="f-result" role="status"></span>
         </div>
         <details class="presets">
-          <summary>Quick-fill presets (free tiers — bring your own key)</summary>
+          <summary>Quick-fill presets — optional shortcuts for popular providers</summary>
           <div class="preset-chips" id="preset-chips"></div>
         </details>
       </form>

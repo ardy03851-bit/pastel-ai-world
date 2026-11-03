@@ -17,19 +17,27 @@
       overflow: hidden;
     }
     .toolbar {
-      width: 76px;
+      width: 150px;
       flex: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: var(--space-2);
-      padding: var(--space-3) var(--space-2);
-      background: var(--color-surface);
-      border-right: 1px solid var(--color-border);
+      padding: var(--space-3);
+      background: var(--glass-bg);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      border-right: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight);
       overflow-y: auto;
+      scrollbar-width: thin;
+      animation: panel-in-left 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes panel-in-left {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: none; }
     }
     .tool-btn {
-      width: 58px;
+      width: 100%;
       height: 58px;
       border-radius: var(--radius-lg);
       display: flex;
@@ -55,11 +63,14 @@
       background: var(--accent-highlight);
       border-color: var(--accent);
       color: var(--color-text);
+      box-shadow: var(--glass-highlight), 0 4px 14px color-mix(in oklab, var(--accent) 30%, transparent);
     }
     .tool-btn:active { transform: scale(0.92); }
-    .tool-btn .tool-icon, .tool-btn svg.lucide { width: 22px; height: 22px; }
+    .tool-btn .tool-icon, .tool-btn svg.lucide { width: 22px; height: 22px; transition: transform var(--transition-bouncy); }
+    .tool-btn:hover .tool-icon, .tool-btn:hover svg.lucide { transform: scale(1.15); }
     .tool-sep {
-      width: 40px;
+      grid-column: 1 / -1;
+      width: 100%;
       height: 1px;
       background: var(--color-divider);
       margin: var(--space-1) 0;
@@ -80,18 +91,19 @@
       right: auto;
       transform: translateX(-50%);
       max-width: calc(100% - 32px);
-      background: color-mix(in oklab, var(--color-surface) 88%, transparent);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--color-border);
+      background: var(--glass-bg-strong);
+      -webkit-backdrop-filter: blur(18px) saturate(1.5);
+      backdrop-filter: blur(18px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), var(--shadow-md);
       border-radius: var(--radius-full);
       padding: var(--space-2) var(--space-5);
       font-size: var(--text-sm);
       color: var(--color-text);
-      box-shadow: var(--shadow-md);
       z-index: 10;
       pointer-events: none;
       opacity: 0;
-      transition: opacity var(--transition-interactive);
+      transition: opacity var(--transition-interactive), transform var(--transition-bouncy);
       text-align: center;
       max-width: 90%;
     }
@@ -104,15 +116,17 @@
       bottom: auto;
       transform: none;
       font-size: var(--text-xs);
-      color: rgba(45, 42, 38, 0.55);
-      background: rgba(255, 255, 255, 0.5);
+      color: var(--color-text-muted);
+      background: var(--glass-bg-soft);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius-full);
       padding: 2px var(--space-4);
       z-index: 5;
       pointer-events: none;
       white-space: nowrap;
     }
-    [data-theme='dark'] .stage-legend { color: rgba(240, 238, 246, 0.6); background: rgba(30, 28, 40, 0.5); }
     .stage-actions {
       position: absolute;
       top: var(--space-4);
@@ -130,14 +144,15 @@
       width: min(340px, 60%);
       max-height: 200px;
       overflow-y: auto;
-      background: color-mix(in oklab, var(--color-surface) 85%, transparent);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--color-border);
+      background: var(--glass-bg);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), var(--shadow-md);
       border-radius: var(--radius-lg);
       padding: var(--space-3) var(--space-4);
       font-size: var(--text-xs);
       z-index: 10;
-      box-shadow: var(--shadow-sm);
     }
     .world-log h3 {
       font-size: var(--text-xs);
@@ -157,12 +172,20 @@
 
     /* Inspector */
     .inspector {
-      width: 320px;
+      width: 324px;
       flex: none;
-      background: var(--color-surface);
-      border-left: 1px solid var(--color-border);
+      background: var(--glass-bg);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      border-left: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight);
       overflow-y: auto;
       padding: var(--space-5);
+      animation: panel-in-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes panel-in-right {
+      from { opacity: 0; transform: translateX(16px); }
+      to { opacity: 1; transform: none; }
     }
     .inspector h2 {
       font-size: var(--text-base);
@@ -241,26 +264,31 @@
       font-size: 12px;
       font-weight: 700;
       color: #4a4740;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.55);
+      -webkit-backdrop-filter: blur(10px) saturate(1.4);
+      backdrop-filter: blur(10px) saturate(1.4);
       padding: 2px 10px;
       border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 2px 10px rgba(60, 55, 45, 0.14);
       white-space: nowrap;
-      box-shadow: 0 1px 4px rgba(60, 55, 45, 0.18);
     }
     .cube-speech {
       margin-top: 4px;
       max-width: 220px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.6);
+      -webkit-backdrop-filter: blur(16px) saturate(1.5);
+      backdrop-filter: blur(16px) saturate(1.5);
       color: #3d3a33;
       font-size: 12px;
       line-height: 1.45;
       padding: 6px 12px;
       border-radius: 14px;
-      border: 1px solid rgba(60, 55, 45, 0.08);
-      box-shadow: 0 4px 14px rgba(60, 55, 45, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: 0 6px 18px rgba(60, 55, 45, 0.16);
       opacity: 0;
       transform: translateY(6px) scale(0.95);
-      transition: opacity .3s, transform .3s;
+      transition: opacity .3s, transform .35s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-align: center;
     }
     .cube-speech.show { opacity: 1; transform: none; }
@@ -269,6 +297,7 @@
       .world-shell { flex-direction: column; height: auto; }
       .toolbar {
         width: 100%;
+        display: flex;
         flex-direction: row;
         justify-content: flex-start;
         border-right: none;
@@ -276,10 +305,10 @@
         overflow-x: auto;
       }
       .tool-sep { width: 1px; height: 40px; margin: 0 var(--space-1); }
-      .stage { flex: none; height: 62dvh; }
+      .stage { flex: none; height: 56dvh; }
       .stage-hint { top: 104px; right: var(--space-4); }
       .stage-legend { display: none; }
-      .inspector { width: 100%; border-left: none; border-top: 1px solid var(--color-border); }
+      .inspector { width: 100%; border-left: none; border-top: 1px solid var(--color-border); min-height: 30dvh; }
       .world-log { display: none; }
     }
   </style>
@@ -307,12 +336,21 @@
       <button class="tool-btn" data-tool="ai" title="Add an AI cube — then click the baseplate"><i data-lucide="bot" class="tool-icon"></i>AI</button>
       <div class="tool-sep"></div>
       <button class="tool-btn" data-tool="tree" title="Tree — click the baseplate to place"><i data-lucide="tree-pine" class="tool-icon"></i>Tree</button>
-      <button class="tool-btn" data-tool="rock" title="Rock"><i data-lucide="mountain" class="tool-icon"></i>Rock</button>
-      <button class="tool-btn" data-tool="ball" title="Ball"><i data-lucide="circle" class="tool-icon"></i>Ball</button>
-      <button class="tool-btn" data-tool="lamp" title="Lamp"><i data-lucide="lamp" class="tool-icon"></i>Lamp</button>
-      <button class="tool-btn" data-tool="pillar" title="Pillar"><i data-lucide="landmark" class="tool-icon"></i>Pillar</button>
-      <button class="tool-btn" data-tool="ring" title="Ring"><i data-lucide="circle-dashed" class="tool-icon"></i>Ring</button>
+      <button class="tool-btn" data-tool="bush" title="Bush"><i data-lucide="sprout" class="tool-icon"></i>Bush</button>
       <button class="tool-btn" data-tool="flower" title="Flower"><i data-lucide="flower-2" class="tool-icon"></i>Flower</button>
+      <button class="tool-btn" data-tool="rock" title="Rock"><i data-lucide="mountain" class="tool-icon"></i>Rock</button>
+      <button class="tool-btn" data-tool="pond" title="Pond"><i data-lucide="droplets" class="tool-icon"></i>Pond</button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" data-tool="house" title="House"><i data-lucide="home" class="tool-icon"></i>House</button>
+      <button class="tool-btn" data-tool="pillar" title="Pillar"><i data-lucide="landmark" class="tool-icon"></i>Pillar</button>
+      <button class="tool-btn" data-tool="bench" title="Bench"><i data-lucide="armchair" class="tool-icon"></i>Bench</button>
+      <button class="tool-btn" data-tool="arch" title="Arch"><i data-lucide="rainbow" class="tool-icon"></i>Arch</button>
+      <button class="tool-btn" data-tool="lamp" title="Lamp"><i data-lucide="lamp" class="tool-icon"></i>Lamp</button>
+      <div class="tool-sep"></div>
+      <button class="tool-btn" data-tool="ball" title="Ball"><i data-lucide="circle" class="tool-icon"></i>Ball</button>
+      <button class="tool-btn" data-tool="ring" title="Ring"><i data-lucide="circle-dashed" class="tool-icon"></i>Ring</button>
+      <button class="tool-btn" data-tool="cloud" title="Cloud"><i data-lucide="cloud" class="tool-icon"></i>Cloud</button>
+      <button class="tool-btn" data-tool="crystal" title="Crystal"><i data-lucide="gem" class="tool-icon"></i>Crystal</button>
       <button class="tool-btn" data-tool="star" title="Star"><i data-lucide="star" class="tool-icon"></i>Star</button>
     </aside>
 
