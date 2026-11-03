@@ -57,7 +57,7 @@
       color: var(--color-text);
     }
     .tool-btn:active { transform: scale(0.92); }
-    .tool-btn .tool-emoji { font-size: 22px; line-height: 1; }
+    .tool-btn .tool-icon, .tool-btn svg.lucide { width: 22px; height: 22px; }
     .tool-sep {
       width: 40px;
       height: 1px;
@@ -75,9 +75,11 @@
     .stage canvas { touch-action: none; }
     .stage-hint {
       position: absolute;
-      top: var(--space-4);
+      top: 60px;
       left: 50%;
+      right: auto;
       transform: translateX(-50%);
+      max-width: calc(100% - 32px);
       background: color-mix(in oklab, var(--color-surface) 88%, transparent);
       backdrop-filter: blur(8px);
       border: 1px solid var(--color-border);
@@ -96,9 +98,11 @@
     .stage-hint.show { opacity: 1; }
     .stage-legend {
       position: absolute;
-      bottom: var(--space-3);
-      left: 50%;
-      transform: translateX(-50%);
+      top: var(--space-4);
+      left: var(--space-4);
+      right: auto;
+      bottom: auto;
+      transform: none;
       font-size: var(--text-xs);
       color: rgba(45, 42, 38, 0.55);
       background: rgba(255, 255, 255, 0.5);
@@ -168,7 +172,8 @@
       gap: var(--space-2);
     }
     .insp-empty { color: var(--color-text-muted); font-size: var(--text-sm); text-align: center; padding: var(--space-8) 0; }
-    .insp-empty .empty-art { font-size: 40px; margin-bottom: var(--space-3); }
+    .insp-empty .empty-art { font-size: 40px; margin-bottom: var(--space-3); color: var(--accent); }
+    .insp-empty .empty-art svg { width: 40px; height: 40px; }
     .agent-head {
       display: flex;
       align-items: center;
@@ -272,7 +277,7 @@
       }
       .tool-sep { width: 1px; height: 40px; margin: 0 var(--space-1); }
       .stage { flex: none; height: 62dvh; }
-      .stage-hint { top: 104px; }
+      .stage-hint { top: 104px; right: var(--space-4); }
       .stage-legend { display: none; }
       .inspector { width: 100%; border-left: none; border-top: 1px solid var(--color-border); }
       .world-log { display: none; }
@@ -299,16 +304,16 @@
 
   <div class="world-shell">
     <aside class="toolbar" id="toolbar" aria-label="Add objects">
-      <button class="tool-btn" data-tool="ai" title="Add an AI cube — then click the baseplate"><span class="tool-emoji">🤖</span>AI</button>
+      <button class="tool-btn" data-tool="ai" title="Add an AI cube — then click the baseplate"><i data-lucide="bot" class="tool-icon"></i>AI</button>
       <div class="tool-sep"></div>
-      <button class="tool-btn" data-tool="tree" title="Tree — click the baseplate to place"><span class="tool-emoji">🌳</span>Tree</button>
-      <button class="tool-btn" data-tool="rock" title="Rock"><span class="tool-emoji">🪨</span>Rock</button>
-      <button class="tool-btn" data-tool="ball" title="Ball"><span class="tool-emoji">⚽</span>Ball</button>
-      <button class="tool-btn" data-tool="lamp" title="Lamp"><span class="tool-emoji">💡</span>Lamp</button>
-      <button class="tool-btn" data-tool="pillar" title="Pillar"><span class="tool-emoji">🏛️</span>Pillar</button>
-      <button class="tool-btn" data-tool="ring" title="Ring"><span class="tool-emoji">⭕</span>Ring</button>
-      <button class="tool-btn" data-tool="flower" title="Flower"><span class="tool-emoji">🌸</span>Flower</button>
-      <button class="tool-btn" data-tool="star" title="Star"><span class="tool-emoji">⭐</span>Star</button>
+      <button class="tool-btn" data-tool="tree" title="Tree — click the baseplate to place"><i data-lucide="tree-pine" class="tool-icon"></i>Tree</button>
+      <button class="tool-btn" data-tool="rock" title="Rock"><i data-lucide="mountain" class="tool-icon"></i>Rock</button>
+      <button class="tool-btn" data-tool="ball" title="Ball"><i data-lucide="circle" class="tool-icon"></i>Ball</button>
+      <button class="tool-btn" data-tool="lamp" title="Lamp"><i data-lucide="lamp" class="tool-icon"></i>Lamp</button>
+      <button class="tool-btn" data-tool="pillar" title="Pillar"><i data-lucide="landmark" class="tool-icon"></i>Pillar</button>
+      <button class="tool-btn" data-tool="ring" title="Ring"><i data-lucide="circle-dashed" class="tool-icon"></i>Ring</button>
+      <button class="tool-btn" data-tool="flower" title="Flower"><i data-lucide="flower-2" class="tool-icon"></i>Flower</button>
+      <button class="tool-btn" data-tool="star" title="Star"><i data-lucide="star" class="tool-icon"></i>Star</button>
     </aside>
 
     <section class="stage" id="stage" aria-label="3D world">
@@ -326,7 +331,7 @@
 
     <aside class="inspector" id="inspector" aria-label="Inspector">
       <div class="insp-empty" id="insp-empty">
-        <div class="empty-art">🧊</div>
+        <div class="empty-art"><i data-lucide="box"></i></div>
         <h3>Nothing selected</h3>
         <p>Click “Add AI” to drop a thinking cube on the baseplate, pick an object from the palette, or click any object to inspect it.</p>
       </div>

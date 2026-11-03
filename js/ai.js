@@ -12,6 +12,8 @@
     pollinations: { label: 'Pollinations.ai (free, no key)', baseUrl: 'https://text.pollinations.ai' },
     puter: { label: 'Puter.js (free browser SDK)', baseUrl: '' },
     horde: { label: 'AI Horde (free, community)', baseUrl: 'https://aihorde.net/api/v2' },
+    ovh: { label: 'OVHcloud AI Endpoints (free, no key)', baseUrl: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1' },
+    llm7: { label: 'LLM7.io (free, no key)', baseUrl: 'https://api.llm7.io/v1' },
   };
   AI.KINDS = KINDS;
 
@@ -30,6 +32,11 @@
     { name: 'Cerebras (free tier)', kind: 'openai', baseUrl: 'https://api.cerebras.ai/v1', modelId: 'llama-3.3-70b' },
     { name: 'SambaNova 2', kind: 'openai', baseUrl: 'https://api.sambanova.ai/v1', modelId: 'Llama-4-Maverick-17B-128E-Instruct' },
     { name: 'Hugging Face Router', kind: 'openai', baseUrl: 'https://router.huggingface.co/v1', modelId: 'meta-llama/Llama-3.3-70B-Instruct' },
+    { name: 'OVHcloud AI (keyless)', kind: 'ovh', baseUrl: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1', modelId: 'Qwen3.6-27B' },
+    { name: 'LLM7.io (keyless)', kind: 'llm7', baseUrl: 'https://api.llm7.io/v1', modelId: 'GLM-5.3-Flash' },
+    { name: 'BlockRun.ai (needs proxy)', kind: 'openai', baseUrl: 'https://blockrun.ai/api/v1', modelId: 'llama-3.2-11b-vision' },
+    { name: 'Kilo Gateway free (needs proxy)', kind: 'openai', baseUrl: 'https://api.kilo.ai/api/gateway', modelId: 'reflection/beam-free' },
+    { name: 'Z.ai GLM (free tier)', kind: 'openai', baseUrl: 'https://api.z.ai/api/paas/v4', modelId: 'glm-4-flash' },
   ];
 
   /* ---------------- Proxy URL handling ----------------
@@ -77,11 +84,12 @@
   };
 
   async function chatOpenAI(model, messages, opts) {
-    const base = (model.baseUrl || '').replace(/\/$/, '');
+    const base = (model.baseUrl || KINDS[model.kind]?.baseUrl || '').replace(/\/$/, '');
     if (!base) throw new Error('Missing API base URL');
     const url = AI.applyProxy(base + '/chat/completions', model.proxyUrl);
     const headers = { 'Content-Type': 'application/json' };
-    if (model.apiKey) headers.Authorization = 'Bearer ' + model.apiKey;
+    const key = model.apiKey || KINDS[model.kind]?.defaultKey || '';
+    if (key) headers.Authorization = 'Bearer ' + key;
     const body = {
       model: model.modelId,
       messages,
@@ -203,7 +211,7 @@
 
   /* ---------------- Free model discovery ---------------- */
   AI.fetchFreeModels = async function () {
-    const results = { pollinations: [], horde: [], puter: [], errors: [] };
+    const results = { pollinations: [], horde: [], puter: [], ovh: [], llm7: [], errors: [] };
 
     // Pollinations — live model list, keyless
     try {
@@ -274,6 +282,43 @@
       }
     } catch (e) {
       results.errors.push('Puter: ' + e.message);
+    }
+
+    // OVHcloud AI Endpoints — EU-hosted open models, anonymous tier, no key
+    try {
+      const { json } = await httpJson('https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/models', {}, 15000);
+      const list = Array.isArray(json?.data) ? json.data : [];
+      results.ovh = list
+        .filter((m) => m && m.id)
+        .slice(0, 20)
+        .map((m) => ({
+          id: m.id,
+          name: m.id,
+          kind: 'ovh',
+          description: `EU-hosted · anonymous tier (~2 requests/min per model${m.context_length ? `, ${Math.round(m.context_length / 1000)}K context` : ''})`,
+          free: true,
+          keyless: true,
+        }));
+    } catch (e) {
+      results.errors.push('OVHcloud: ' + e.message);
+    }
+
+    // LLM7 — turbo-tier models work anonymously (no auth header; CORS blocks it)
+    try {
+      const { json } = await httpJson('https://api.llm7.io/v1/models', {}, 15000);
+      const list = Array.isArray(json?.data) ? json.data : [];
+      results.llm7 = list
+        .filter((m) => m && m.id && m.tier === 'turbo')
+        .map((m) => ({
+          id: m.id,
+          name: m.id,
+          kind: 'llm7',
+          description: `Anonymous tier (~60 requests/hour${m.context_window?.tokens ? `, ${Math.round(m.context_window.tokens / 1000)}K context` : ''}) · can be busy at peak times`,
+          free: true,
+          keyless: true,
+        }));
+    } catch (e) {
+      results.errors.push('LLM7: ' + e.message);
     }
 
     return results;

@@ -30,10 +30,11 @@
     const card = document.createElement('div');
     card.className = 'free-card';
     const saved = PW.data.models.some((x) => x.kind === m.kind && x.modelId === m.id);
+    const kindLabels = { puter: 'free · puter', horde: 'free · horde', ovh: 'free · ovh', llm7: 'free · llm7' };
     card.innerHTML = `
       <div class="free-head">
         <strong>${PW.escapeHtml(m.name)}</strong>
-        <span class="badge badge-free">${m.kind === 'puter' ? 'free · puter' : m.kind === 'horde' ? 'free · horde' : 'free · no key'}</span>
+        <span class="badge badge-free">${kindLabels[m.kind] || 'free · no key'}</span>
       </div>
       <p>${PW.escapeHtml(m.description || '')}</p>
       <button class="btn ${saved ? 'btn-ghost' : 'btn-primary'} btn-sm">${saved ? 'Added ✓' : 'Add to my models'}</button>
@@ -43,7 +44,7 @@
       if (!dup) {
         PW.data.models.push({
           id: PW.uid(), name: m.name, kind: m.kind, modelId: m.id,
-          baseUrl: '', apiKey: '', proxyUrl: '', free: true, keyless: true,
+          baseUrl: m.baseUrl || '', apiKey: m.defaultKey || '', proxyUrl: m.proxyUrl || '', free: true, keyless: true,
         });
         PW.save();
         PW.toast(`Added ${m.name}`);
@@ -64,16 +65,21 @@
       const all = [
         ...res.pollinations,
         ...res.puter,
+        ...res.ovh,
+        ...res.llm7,
         ...res.horde,
       ];
       if (!all.length) {
-        freeGrid.innerHTML = '<div class="empty-state"><div class="empty-art">🌬️</div><h3>No free models available right now</h3><p>The keyless providers are unreachable. You can still add your own model below, or try again in a moment.</p></div>';
+        freeGrid.innerHTML = '<div class="empty-state"><div class="empty-art"><i data-lucide="wind"></i></div><h3>No free models available right now</h3><p>The keyless providers are unreachable. You can still add your own model below, or try again in a moment.</p></div>';
+        lucide.createIcons();
       } else {
         all.forEach((m) => freeGrid.appendChild(freeCard(m)));
       }
       const bits = [];
       if (res.pollinations.length) bits.push(`${res.pollinations.length} Pollinations`);
       if (res.puter.length) bits.push(`${res.puter.length} Puter`);
+      if (res.ovh.length) bits.push(`${res.ovh.length} OVHcloud`);
+      if (res.llm7.length) bits.push(`${res.llm7.length} LLM7`);
       if (res.horde.length) bits.push(`${res.horde.length} AI Horde`);
       freeStatus.textContent = bits.length ? 'Found ' + bits.join(' · ') : 'No keyless models found';
       if (res.errors.length) freeStatus.title = res.errors.join('\n');
@@ -142,7 +148,8 @@
   function renderSaved() {
     const models = PW.data.models;
     if (!models.length) {
-      savedList.innerHTML = `<div class="empty-state"><div class="empty-art">🧠</div><h3>No models yet</h3><p>Add your own below, or pick one from the free section above — it takes seconds.</p></div>`;
+      savedList.innerHTML = `<div class="empty-state"><div class="empty-art"><i data-lucide="brain"></i></div><h3>No models yet</h3><p>Add your own below, or pick one from the free section above — it takes seconds.</p></div>`;
+      lucide.createIcons();
       return;
     }
     savedList.innerHTML = `<div class="table-wrap"><table>
@@ -195,8 +202,12 @@
   /* ---------------- Provider directory ---------------- */
   const DIRECTORY = [
     ['Pollinations.ai', 'Completely free, no key, no account. Live model list fetched above.', 'No'],
+    ['OVHcloud AI Endpoints', 'EU-hosted open models, anonymous tier, no key. ~2 requests/min per model.', 'No'],
+    ['LLM7.io', 'Turbo models work anonymously (~60 requests/hour). Can be busy at peak times.', 'No'],
     ['AI Horde', 'Community-powered. Anonymous key 0000000000. Can be slow.', 'No'],
     ['Puter.js', 'Browser SDK; a free Puter account covers usage on first chat.', 'No (free account)'],
+    ['BlockRun.ai', 'Keyless NVIDIA-hosted models — works, but needs a CORS proxy in the browser.', 'No (proxy)'],
+    ['Kilo Gateway', 'Free routes like reflection/beam-free (~200 requests/hour) — needs a CORS proxy.', 'No (proxy)'],
     ['Hack Club AI', 'Every OpenRouter model behind one key — free for Hack Clubbers.', 'Free key'],
     ['Groq', 'Free plan: fast open models, ~1k requests/day.', 'Free key'],
     ['Google Gemini', 'Free tier on Flash models, generous limits.', 'Free key'],
@@ -207,6 +218,8 @@
     ['Cerebras', 'Free tier: 1M tokens/day, ultra fast.', 'Free key'],
     ['Cloudflare Workers AI', '10,000 neurons/day free.', 'Free key'],
     ['NVIDIA API catalog', 'Free prototyping endpoints for many models.', 'Free key'],
+    ['Z.ai (GLM)', 'Free tier on GLM flash models.', 'Free key'],
+    ['free.ai', '30,000 tokens/day free pool — needs a free signup.', 'Free key'],
     ['Hetzner Inference', 'Experimental free Qwen endpoints (EU).', 'Free account'],
     ['Together AI', '$5 free credit on signup.', 'Free key'],
     ['DeepSeek', 'Very cheap, occasional free promos.', 'Paid'],

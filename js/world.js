@@ -204,27 +204,17 @@ const BUILDERS = {
   },
 };
 
-/* Agent cube — rounded, with cute eyes */
+/* Agent cube — rounded */
 function buildAgentMesh(color) {
   const g = new THREE.Group();
   const body = new THREE.Mesh(
-    new RoundedBoxGeometry(1.15, 1.15, 1.15, 6, 0.34),
+    new RoundedBoxGeometry(1.15, 1.15, 1.15, 6, 0.12),
     new THREE.MeshStandardMaterial({ color, roughness: 0.5 })
   );
   body.position.y = 0.62;
   body.castShadow = W.shadows;
   body.receiveShadow = W.shadows;
   g.add(body);
-  const eyeGeo = new THREE.SphereGeometry(0.11, 12, 10);
-  const eyeMat = std('#ffffff', { roughness: 0.3 });
-  const pupilMat = std('#3d3a33', { roughness: 0.3 });
-  for (const sx of [-0.24, 0.24]) {
-    const eye = new THREE.Mesh(eyeGeo, eyeMat);
-    eye.position.set(sx, 0.78, 0.56);
-    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), pupilMat);
-    pupil.position.set(sx, 0.78, 0.65);
-    g.add(eye, pupil);
-  }
   return g;
 }
 
@@ -486,7 +476,7 @@ function openAddAI() {
       <span class="hint" id="ai-fetch-status"></span>
     </div>
   `);
-  lucide.createIcons({ attrs: {}, nameAttr: 'data-lucide' });
+  lucide.createIcons();
 
   let mode = 'freedom';
   el.querySelector('#ai-mode').addEventListener('click', (e) => {
@@ -902,7 +892,7 @@ function renderConvo(ent) {
     try {
       const p = JSON.parse(m.content);
       body = (p.actions || []).map((x) => x.action + (x.text ? ` “${x.text}”` : x.dx !== undefined ? ` (${x.dx},${x.dz})` : '')).join(', ');
-      if (p.thought) body = '💭 ' + p.thought + ' → ' + body;
+      if (p.thought) body = 'Thought: ' + p.thought + ' → ' + body;
     } catch (e) { /* plain */ }
     const cls = m.role === 'assistant' ? 'thought' : m.role === 'user' ? '' : 'err';
     return `<div class="convo-line ${cls}"><span class="who">${m.role === 'assistant' ? a.name : m.role === 'user' ? 'you' : m.role}</span><br>${PW.escapeHtml(body).slice(0, 300)}</div>`;
@@ -1061,6 +1051,7 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 animate();
+lucide.createIcons();
 
 /* welcome hint */
 if (!PW.data.agents.length) {

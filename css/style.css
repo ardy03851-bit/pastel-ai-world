@@ -743,6 +743,11 @@ input[type='range'] {
   font-size: 44px;
   margin-bottom: var(--space-4);
   filter: saturate(0.85);
+  color: var(--accent);
+}
+.empty-state .empty-art svg {
+  width: 44px;
+  height: 44px;
 }
 
 /* ============ Tables ============ */
@@ -796,6 +801,11 @@ tbody tr:hover {
 .link-art {
   font-size: 40px;
   margin-bottom: var(--space-3);
+  color: var(--accent);
+}
+.link-art svg {
+  width: 40px;
+  height: 40px;
 }
 .steps {
   margin: 0;
