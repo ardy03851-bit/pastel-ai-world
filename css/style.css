@@ -466,6 +466,9 @@ a:hover {
 .card + .card {
   margin-top: var(--space-5);
 }
+.grid .card + .card {
+  margin-top: 0;
+}
 
 .card h2 {
   font-size: var(--text-lg);
